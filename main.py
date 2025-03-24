@@ -1,55 +1,71 @@
 class StudentManagement:
+   
     def __init__(self, filename):
         self.filename = filename
-
-    # Create operation: Add a new student with user input
+    
     def create(self):
+        # Gather student information, including the new fields
         student_id = input("Enter student ID: ")
-        name = input("Enter student Name: ")
+        first_name = input("Enter student First Name: ")
+        last_name = input("Enter student Last Name: ")
         age = input("Enter student Age: ")
+        department = input("Enter student Department: ")
 
-        # Validate input (basic check for age to be a number)
+        # Check if age is a number
         if not age.isdigit():
-            print("Error: Age must be a number.")
-            return
+            print("Error: Age must be a number.") 
+            return  
 
-        # Save the student data into the file
+        # Open the file in append mode ('a') to add new data without overwriting existing data
         with open(self.filename, 'a') as file:
-            file.write(f"{student_id},{name},{age}\n")
-        print(f"Student '{name}' added successfully.")
+            file.write(f"{student_id},{first_name},{last_name},{age},{department}\n")
 
-    # Read operation: Display all students
+        print(f"Student '{first_name} {last_name}' added successfully.")
+
     def read(self):
         try:
             with open(self.filename, 'r') as file:
                 lines = file.readlines()
                 if lines:
                     print("Student Information:")
+
                     for line in lines:
                         student_data = line.strip().split(",")
-                        print(f"ID: {student_data[0]}, Name: {student_data[1]}, Age: {student_data[2]}")
+                        print(f"ID: {student_data[0]}, First Name: {student_data[1]}, Last Name: {student_data[2]}, Age: {student_data[3]}, Department: {student_data[4]}")
                 else:
                     print("No student data found.")
         except FileNotFoundError:
             print("File not found. No data to read.")
 
-    # Update operation: Update a student's information
-    def update(self, student_id, new_name=None, new_age=None):
+    def update(self, student_id, new_first_name=None, new_last_name=None, new_age=None, new_department=None):
         try:
             with open(self.filename, 'r') as file:
                 lines = file.readlines()
 
             with open(self.filename, 'w') as file:
-                updated = False
+                updated = False  # Flag to check if any update has been made
+
+                # Loop through each line in the file
                 for line in lines:
                     student_data = line.strip().split(",")
+                    
                     if student_data[0] == student_id:
-                        if new_name:
-                            student_data[1] = new_name
+                        # Update fields if new data is provided
+                        if new_first_name:
+                            student_data[1] = new_first_name
+
+                        if new_last_name:
+                            student_data[2] = new_last_name
+
                         if new_age:
-                            student_data[2] = new_age
+                            student_data[3] = new_age
+                            
+                        if new_department:
+                            student_data[4] = new_department
+
+                        # Write the updated student data back to the file
                         file.write(",".join(student_data) + "\n")
-                        updated = True
+                        updated = True  
                     else:
                         file.write(line)
                 
@@ -60,21 +76,20 @@ class StudentManagement:
         except FileNotFoundError:
             print("File not found. No data to update.")
 
-    # Delete operation: Delete a student by ID
     def delete(self, student_id):
         try:
             with open(self.filename, 'r') as file:
                 lines = file.readlines()
 
             with open(self.filename, 'w') as file:
-                deleted = False
+                deleted = False  # Flag to check if any deletion has been made
                 for line in lines:
                     student_data = line.strip().split(",")
                     if student_data[0] != student_id:
                         file.write(line)
                     else:
-                        deleted = True
-                
+                        deleted = True  
+
                 if deleted:
                     print(f"Student ID '{student_id}' deleted successfully.")
                 else:
@@ -82,42 +97,49 @@ class StudentManagement:
         except FileNotFoundError:
             print("File not found. No data to delete.")
 
-
-# Example usage:
+# Main program execution starts here
 if __name__ == "__main__":
-    # File where student data will be stored
-    filename = "students.txt"
 
-    # Create student management object
+    filename = "students.txt"
     student_manager = StudentManagement(filename)
 
-    # Main menu loop to interact with the student management system
+    # Infinite loop to display the menu 
     while True:
+        # Display the menu options
         print("\n--- Student Management System ---")
-        print("1. Create Student")
+        print("1. Register")
         print("2. View All Students")
         print("3. Update Student Information")
         print("4. Delete Student")
         print("5. Exit")
-        
+
         choice = input("Enter your choice: ")
 
-        if choice == '1':
-            student_manager.create()  # Create a new student by input
-        elif choice == '2':
-            student_manager.read()  # Display all students
-        elif choice == '3':
-            student_id = input("Enter student ID to update: ")
-            new_name = input("Enter new Name (or press Enter to skip): ")
-            new_age = input("Enter new Age (or press Enter to skip): ")
+        match choice:
+            case '1':  
+                student_manager.create()
+            case '2': 
+                student_manager.read()
+            case '3':  
+                student_id = input("Enter student ID to update: ")
+                new_first_name = input("Enter new First Name (or press Enter to skip): ")
+                new_last_name = input("Enter new Last Name (or press Enter to skip): ")
+                new_age = input("Enter new Age (or press Enter to skip): ")
+                new_department = input("Enter new Department (or press Enter to skip): ")
+               # Simplified update method call
+                student_manager.update(
+                                        student_id, 
+                                        new_first_name or None, 
+                                        new_last_name or None, 
+                                        new_age or None, 
+                                        new_department or None)
 
-            # Update only if there's new data provided
-            student_manager.update(student_id, new_name if new_name else None, new_age if new_age else None)
-        elif choice == '4':
-            student_id = input("Enter student ID to delete: ")
-            student_manager.delete(student_id)  # Delete student by ID
-        elif choice == '5':
-            print("Exiting the system. Goodbye!")
-            break
-        else:
-            print("Invalid choice. Please try again.")
+
+            case '4':  
+                student_id = input("Enter student ID to delete: ")
+                student_manager.delete(student_id)
+            case '5':  
+                print("Exiting the system. Goodbye!")
+                break
+            case _: 
+                print("Invalid choice. Please try again.")
