@@ -43,9 +43,8 @@ class StudentManagement:
                 lines = file.readlines()
 
             with open(self.filename, 'w') as file:
-                updated = False  # Flag to check if any update has been made
+                updated = False  
 
-                # Loop through each line in the file
                 for line in lines:
                     student_data = line.strip().split(",")
                     
@@ -106,7 +105,7 @@ if __name__ == "__main__":
     # Infinite loop to display the menu 
     while True:
         # Display the menu options
-        print("\n--- Student Management System ---")
+        print("\n--- CRUD Operations on Student's Information ---")
         print("1. Register")
         print("2. View All Students")
         print("3. Update Student Information")
